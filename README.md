@@ -1,8 +1,13 @@
-## Google Drive API
+## A node.js Google Drive API
 
 1. list all files `list`
 2. get specific file `file`
 3. upload specific file to a specific folder `upload`
+
+### Prerequisites
+- create your own credentials.json --> https://developers.google.com/drive/api/v3/quickstart/nodejs
+- install googledrive libraries `npm install googleapis@39 --save`
+- First time you execute one of the available apis, you need to authenticate/authorize the app by creating your own token.json
 
 ### Execute
 `node index.js --type=list`
