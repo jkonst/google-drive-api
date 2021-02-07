@@ -1,4 +1,4 @@
-## Google Drive APIs
+## Google Drive API
 
 1. list all files `list`
 2. get specific file `file`
