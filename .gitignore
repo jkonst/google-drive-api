@@ -4,5 +4,5 @@
 # IDEs and editors
 /.idea
 
-token.json
-credentials.json
+keys/token.json
+keys/credentials.json
