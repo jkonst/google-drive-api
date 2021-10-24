@@ -1,4 +1,4 @@
-## A node.js Google Drive API
+## A node.js Google Drive API in Typescript
 
 1. list all files `list`
 2. get specific file `file`
