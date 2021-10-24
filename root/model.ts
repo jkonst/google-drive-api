@@ -1,8 +1,8 @@
-import * as fs  from 'fs';
+import * as fs from 'fs';
 
 export interface GoogleCredential {
     installed: GoogleInstalledToken;
-};
+}
 
 export interface GoogleInstalledToken {
     client_id: string;
@@ -12,17 +12,9 @@ export interface GoogleInstalledToken {
     auth_provider_x509_cert_url: string;
     client_secret: string;
     redirect_uris: string[];
-};
-
-export interface GoogleToken {
-    access_token: string;
-    refresh_token: string;
-    scope: string;
-    token_type: string;
-    expiry_date: number;
 }
 
-export  interface Argument {
+export interface Argument {
     type: string;
     fileId?: string;
     parentId?: string;
@@ -30,8 +22,8 @@ export  interface Argument {
 }
 
 export interface FileMetadata {
-  name: string;
-  parents: string | string[];
+    name: string;
+    parents: string | string[];
 }
 
 export interface FileMediaType {
