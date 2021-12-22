@@ -18,6 +18,7 @@ export interface Argument {
     type: string;
     fileId?: string;
     parentId?: string;
+    mimeType?: string;
     filePath?: string;
 }
 

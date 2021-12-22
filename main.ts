@@ -20,7 +20,7 @@ const start = async (credentialFileName: string) => {
                     getFile(oAuth2Client, args.fileId);
                     break;
                 case actions.UPLOAD_FILE:
-                    uploadFile(oAuth2Client, args.filePath, args.parentId);
+                    uploadFile(oAuth2Client, args.filePath, args.mimeType, args.parentId);
                     break;
                 default:
                     console.log('type: ' + args.type + ' is not valid');
