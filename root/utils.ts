@@ -1,7 +1,8 @@
 import {drive_v3, google, GoogleApis} from 'googleapis';
-import {promises as fs}  from 'fs';
+import {promises as fs} from 'fs';
 import * as readline from 'readline';
-import {actions, Argument, GoogleCredential} from "./model";
+import {actions, Argument, FileMediaType, FileMetadata, GoogleCredential} from "./model";
+import Params$Resource$Files$Create = drive_v3.Params$Resource$Files$Create;
 
 export type OAuth2Client = typeof GoogleApis.prototype.auth.OAuth2.prototype;
 
@@ -57,6 +58,34 @@ export const authorize = async (credentials: GoogleCredential): Promise<OAuth2Cl
     }
 }
 
+export const createFile = (drive: drive_v3.Drive, metadata: FileMetadata, media: FileMediaType): void => {
+    drive.files.create({
+        resource: metadata,
+        media: media,
+        fields: 'id'
+    } as Params$Resource$Files$Create, (err, res) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Created File w/ Id: ', res.data.id);
+        }
+    });
+};
+
+export const updateFile = (drive: drive_v3.Drive, metadata: FileMetadata, media: FileMediaType, id: string): void => {
+    drive.files.update({
+        fileId: id,
+        resource: metadata,
+        media: media
+    }as Params$Resource$Files$Create, (err, res) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Updated File w/ Id: ', res.data.id);
+        }
+    });
+};
+
 /**
  * Get and store new token after prompting for user authorization, and then
  * execute the given callback with the authorized OAuth2 client.
@@ -98,7 +127,6 @@ const getAndStoreAccessToken = async (oAuth2Client) => {
 export const getList = (drive: drive_v3.Drive, pageToken: string): void => {
     drive.files.list({
         pageSize: 10,
-        // q: `name=${nameParam}`,
         pageToken: pageToken ? pageToken : '',
         fields: 'nextPageToken, files(id, name)',
     }, (error, res) => {
@@ -117,6 +145,37 @@ export const getList = (drive: drive_v3.Drive, pageToken: string): void => {
             console.log('No files found.');
         }
     });
+}
+
+/**
+ * A function that returns the file id after searching for a file on drive
+ * based on its name
+ * @param drive
+ * @param pageToken
+ * @param fileName
+ */
+export const getFileId = async(drive: drive_v3.Drive,
+                          pageToken: string,
+                          fileName: string,
+                          ): Promise<string | null> => {
+    const res = await drive.files.list({
+        pageSize: 10,
+        q: `name='${fileName}'`,
+        pageToken: pageToken ? pageToken : '',
+        fields: 'nextPageToken, files(id, name)',
+    });
+    if (res) {
+        const files = res.data.files;
+        if (files?.length && files.length === 1) {
+            console.log('File found: ' + files[0].id);
+            return files[0].id;
+        } else {
+            console.log(`0 or more than 1 entries of File with name: ${fileName} were found`);
+            return null;
+        }
+    } else {
+        return null;
+    }
 }
 
 const processList = (files: drive_v3.Schema$File[]) => {

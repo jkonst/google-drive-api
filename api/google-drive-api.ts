@@ -1,9 +1,8 @@
-import {getList, OAuth2Client} from "../root/utils";
+import {createFile, getFileId, getList, OAuth2Client, updateFile} from "../root/utils";
 import {drive_v3, google} from "googleapis";
 import * as fs  from 'fs';
 import * as path from "path";
 import {FileMediaType, FileMetadata} from "../root/model";
-import Params$Resource$Files$Create = drive_v3.Params$Resource$Files$Create;
 
 /**
  * Lists the names and IDs of up to 10 files.
@@ -33,8 +32,10 @@ export const getFile = (auth: OAuth2Client, fileId: string): void => {
 /**
  * Uploads a file to a specific folder
  */
-export const uploadFile = (auth: OAuth2Client, filePath: string,
-                           mimeType?: string, parentId?: string) => {
+export const uploadFile = (auth: OAuth2Client,
+                           filePath: string,
+                           mimeType?: string,
+                           parentId?: string) => {
     const drive = google.drive({version: 'v3', auth});
     const name = path.basename(filePath);
 
@@ -42,27 +43,30 @@ export const uploadFile = (auth: OAuth2Client, filePath: string,
         name,
         parents: '',
     };
-    // upload to specific parent folder if parent id is passed
-    if (!!parentId) {
-        fileMetadata = {
-            ...fileMetadata,
-            parents: [parentId],
-        }
-    }
+
     const media: FileMediaType = {
         body: fs.createReadStream(filePath),
         mimeType,
     };
-
-    drive.files.create({
-        resource: fileMetadata,
-        media: media,
-        fields: 'id'
-    } as Params$Resource$Files$Create, (err, res) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('File Id: ', res.data.id);
+    // upload to specific parent folder if parent id is passed
+    if (!!parentId) { // create NEW file
+        fileMetadata = {
+            ...fileMetadata,
+            parents: [parentId],
         }
-    });
+        createFile(drive, fileMetadata, media);
+    } else { // update existing ONE
+        // search for file with specific filename
+        getFileId(drive, '', name).then(result => {
+            if (result) {
+                updateFile(drive, fileMetadata, media, result);
+            } else {
+                console.log(`Error updating file: ${name}`);
+            }
+        }).catch(err => {
+            console.log(`Error updating file: ${name}`);
+            console.error(err);
+        });
+    }
+
 };
